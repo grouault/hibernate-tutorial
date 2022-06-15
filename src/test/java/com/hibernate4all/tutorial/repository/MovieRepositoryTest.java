@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -64,8 +65,7 @@ public class MovieRepositoryTest {
     public void merge_casimule_without_update() {
         Movie movie = new Movie();
         movie.setId(-1L);
-        movie.setName("Inception");
-        movie.setDescription("description init");
+        movie.setName("Inception").setDescription("description init");
         Movie mergedMovie = repository.merge(movie);
         assertThat(movie.getName()).as("Le nom du film n'a pas changé").isEqualTo("Inception");
     }
@@ -114,8 +114,10 @@ public class MovieRepositoryTest {
 
     @Test
     public void testFlushOrder() {
-        Movie movie = service.removeThenAddMovie();
-        assertThat(movie.getDescription()).as("le movie n'est pas le bon").contains("v2");
+        Assertions.assertThrows(DataIntegrityViolationException.class, () ->{
+            Movie movie = service.removeThenAddMovie();
+            assertThat(movie.getDescription()).as("le movie n'est pas le bon").contains("v2");
+        });
     }
 
 }
