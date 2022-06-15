@@ -1,6 +1,7 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.config.PersistenceConfigTest;
+import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.service.MovieService;
 import java.util.List;
@@ -42,7 +43,8 @@ public class MovieRepositoryTest {
     @Test
     public void save_casNominal(){
         Movie movie = new Movie();
-        movie.setName("Inception");
+        movie.setName("Inception V2");
+        movie.setCertification(Certification.INTERDIT_MOINS_12);
         repository.persist(movie);
         System.out.println("[save_CasNominal] - session contains movie : " + entityManager.contains(movie));
         System.out.println("fin de test");
@@ -72,6 +74,7 @@ public class MovieRepositoryTest {
     public void find_casNominal(){
         Movie memento = repository.find(-2L);
         assertThat(memento.getName()).as("mauvais film récupéré").isEqualTo("Memento");
+        assertThat(memento.getCertification()).as("mauvaise certification").isEqualTo(Certification.INTERDIT_MOINS_12);
     }
 
     @Test
