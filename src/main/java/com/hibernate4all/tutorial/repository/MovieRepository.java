@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -22,11 +23,6 @@ public class MovieRepository {
     public Movie persist(Movie movie){
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(movie));
         entityManager.persist(movie);
-        // entityManager.flush();
-        // entityManager.detach(movie);
-        // entityManager.detach(movie);
-        // movie.setDescription("change description");
-        // LOGGER.trace("entityManager.contains() : " + entityManager.contains(movie));
         return movie;
     }
 
@@ -49,12 +45,14 @@ public class MovieRepository {
         return Optional.ofNullable(toUpdate);
     }
 
+    @Transactional
     public Movie find(Long id){
         Movie result = entityManager.find(Movie.class,id);
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
         return result;
     }
 
+    @Transactional
     public List<Movie> getAll(){
         return entityManager.createQuery("from Movie", Movie.class).getResultList();
     }
@@ -72,9 +70,10 @@ public class MovieRepository {
         return result;
     }
 
+    @Transactional
     public Movie getReference(Long id) {
-        Movie result = entityManager.getReference(Movie.class, id);
-        return result;
+        Movie proxy = entityManager.getReference(Movie.class, id);
+        return proxy;
     }
 
 }

@@ -5,7 +5,7 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %d{HH:mm:ss} %-5level %logger{15}.%M %msg%n
+                %d{HH:mm:ss} %highlight(%-5level) %logger{15}.%M %msg%n
             </pattern>
         </encoder>
     </appender>
@@ -25,7 +25,7 @@
         SessionImpl : implementation de la session dans les sources hibernate
         observer la gestion des sessions ouverture / fermeture
     -->
-    <!--logger name="org.hibernate.internal.SessionImpl" level="TRACE" /-->
+    <logger name="org.hibernate.internal.SessionImpl" level="TRACE" />
 
     <!-- mecanisme de flux par defaut
         explication du dirty-checking

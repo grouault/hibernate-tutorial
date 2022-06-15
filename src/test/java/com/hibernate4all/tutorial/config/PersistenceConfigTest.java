@@ -57,6 +57,7 @@ public class PersistenceConfigTest {
         // tables, en fonction des entités déclarées
         properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        // properties.setProperty("org.hibernate.flushMode", "COMMIT");
         return properties;
     }
 

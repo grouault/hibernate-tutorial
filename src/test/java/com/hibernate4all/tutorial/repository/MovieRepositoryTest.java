@@ -2,6 +2,7 @@ package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.config.PersistenceConfigTest;
 import com.hibernate4all.tutorial.domain.Movie;
+import com.hibernate4all.tutorial.service.MovieService;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -32,6 +33,9 @@ public class MovieRepositoryTest {
     @Autowired
     private MovieRepository repository;
 
+    @Autowired
+    private MovieService service;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -40,7 +44,7 @@ public class MovieRepositoryTest {
         Movie movie = new Movie();
         movie.setName("Inception");
         repository.persist(movie);
-        // System.out.println("[save_CasNominal] - session contains movie : " + entityManager.contains(movie));
+        System.out.println("[save_CasNominal] - session contains movie : " + entityManager.contains(movie));
         System.out.println("fin de test");
     }
 
@@ -49,8 +53,19 @@ public class MovieRepositoryTest {
         Movie movie = new Movie();
         movie.setId(-1L);
         movie.setName("Inception 2");
+        movie.setDescription("alter description");
         Movie mergedMovie = repository.merge(movie);
         assertThat(movie.getName()).as("Le nom du film n'a pas changé").isEqualTo("Inception 2");
+    }
+
+    @Test
+    public void merge_casimule_without_update() {
+        Movie movie = new Movie();
+        movie.setId(-1L);
+        movie.setName("Inception");
+        movie.setDescription("description init");
+        Movie mergedMovie = repository.merge(movie);
+        assertThat(movie.getName()).as("Le nom du film n'a pas changé").isEqualTo("Inception");
     }
 
     @Test
@@ -73,6 +88,13 @@ public class MovieRepositoryTest {
     }
 
     @Test
+    public void removeAndGetAll() {
+        List<Movie> movies = service.removeAndGetAll(-1L);
+        assertThat(movies).as("le film n'a pas été supprimé").hasSize(1);
+
+    }
+
+    @Test
     public void getReference_casNominal(){
         Movie movie = repository.getReference(-2L);
         assertThat(movie.getId()).as("la référence n'a pas été correctement chargée").isEqualTo(-2L);
@@ -85,6 +107,12 @@ public class MovieRepositoryTest {
             LOGGER.trace("movie name  : " + movie.getName());
             assertThat(movie.getId()).as("la référence n'a pas été correctement chargée").isEqualTo(-2L);
         });
+    }
+
+    @Test
+    public void testFlushOrder() {
+        Movie movie = service.removeThenAddMovie();
+        assertThat(movie.getDescription()).as("le movie n'est pas le bon").contains("v2");
     }
 
 }

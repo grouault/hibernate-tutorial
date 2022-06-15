@@ -40,9 +40,27 @@ public class MovieService {
         movie.setDescription(description);
     }
 
+    @Transactional
+    public List<Movie> removeAndGetAll(Long id){
+        movieRepository.remove(id);
+        return movieRepository.getAll();
+    }
+
     public List<Movie> getMovies(){
         List<Movie> movies = movieRepository.getAll();
         return movies;
     }
+
+    @Transactional
+    public Movie removeThenAddMovie() {
+        movieRepository.remove(-2L);
+        Movie movie = new Movie();
+        movie.setName("Memento");
+        movie.setDescription("memento v2");
+        movieRepository.persist(movie);
+        return movie;
+    }
+
+
 
 }
