@@ -22,13 +22,13 @@ public class PersistenceConfigTest {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         // pemet de generer le contexte de persistence
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSourceH2());
+        em.setDataSource(dataSourcePOSTGRE());
         em.setPackagesToScan("com.hibernate4all.tutorial.domain",
                 "com.hibernate4all.tutorial.converter");
         // basé sur hibernate
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
-        em.setJpaProperties(additionalProperties());
+        em.setJpaProperties(additionalPropertiesPOSTGRE());
 
         return em;
     }
@@ -45,6 +45,16 @@ public class PersistenceConfigTest {
     }
 
     @Bean
+    public DataSource dataSourcePOSTGRE() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/hibernate4all-test");
+        dataSource.setUsername("postgres");
+        dataSource.setPassword("admin");
+        return dataSource;
+    }
+
+    @Bean
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
@@ -52,12 +62,22 @@ public class PersistenceConfigTest {
         return transactionManager;
     }
 
-    private Properties additionalProperties() {
+    private Properties additionalPropertiesH2() {
         Properties properties = new Properties();
         // au lancement du test : hibernate tente de faire un drop de la structure
         // tables, en fonction des entités déclarées
-        properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+        properties.setProperty("hibernate.hbm2ddl.auto", "create");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        // properties.setProperty("org.hibernate.flushMode", "COMMIT");
+        return properties;
+    }
+
+    private Properties additionalPropertiesPOSTGRE() {
+        Properties properties = new Properties();
+        // au lancement du test : hibernate tente de faire un drop de la structure
+        // tables, en fonction des entités déclarées
+        properties.setProperty("hibernate.hbm2ddl.auto", "create");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         // properties.setProperty("org.hibernate.flushMode", "COMMIT");
         return properties;
     }

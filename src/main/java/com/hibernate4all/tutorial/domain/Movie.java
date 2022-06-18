@@ -1,8 +1,11 @@
 package com.hibernate4all.tutorial.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +14,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -33,6 +39,46 @@ public class Movie {
     // Qd on sauvegarde un movie, ca va sauvegarder les reviews de ce Movie
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<Review>();
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name="Movie_Genre",
+        joinColumns = {@JoinColumn(name="movie_id")},
+        inverseJoinColumns = {@JoinColumn(name="genre_id")}
+    )
+    Set<Genre> genres = new HashSet<>();
+
+    public Movie addReview(Review review) {
+        if (review != null) {
+            this.reviews.add(review);
+            review.setMovie(this);
+        }
+        return this;
+    }
+
+    public Movie removeReview(Review review) {
+        if (review != null) {
+            this.reviews.remove(review);
+            review.setMovie(null);
+        }
+        return this;
+    }
+
+    public Movie addGenre(Genre genre) {
+        if (genre != null) {
+            this.genres.add(genre);
+            genre.getMovies().add(this);
+        }
+        return this;
+    }
+
+    public Movie removeGenre(Genre genre) {
+        if (genre != null) {
+            this.genres.remove(genre);
+            genre.getMovies().remove(this);
+        }
+        return this;
+    }
 
     public Long getId() {
         return id;
@@ -70,12 +116,11 @@ public class Movie {
     }
 
     public List<Review> getReviews() {
-        return reviews;
+        return Collections.unmodifiableList(reviews);
     }
 
-    public Movie setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-        return this;
+    public Set<Genre> getGenres() {
+        return Collections.unmodifiableSet(genres);
     }
 
     @Override
