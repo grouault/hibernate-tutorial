@@ -21,6 +21,7 @@
 
     <!-- observer la gestion des transactions : ouverture / fermeture -->
     <!-- logger name="org.springframework.orm.jpa.JpaTransactionManager" level="DEBUG" /-->
+
     <!--
         SessionImpl : implementation de la session dans les sources hibernate
         observer la gestion des sessions ouverture / fermeture

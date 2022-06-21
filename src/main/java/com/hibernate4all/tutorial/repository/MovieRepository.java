@@ -37,7 +37,7 @@ public class MovieRepository {
     @Transactional
     public Movie merge(Movie movie){
         Movie result = entityManager.merge(movie);
-        entityManager.contains(result);
+        LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
         return result;
     }
 

@@ -51,7 +51,6 @@ public class MovieRepositoryTest {
         movie.setName("Inception V2");
         movie.setCertification(Certification.INTERDIT_MOINS_12);
         repository.persist(movie);
-        // repository.merge(movie);
         System.out.println("[save_CasNominal] - session contains movie : " + entityManager.contains(movie));
         System.out.println("fin de test");
     }
@@ -92,15 +91,31 @@ public class MovieRepositoryTest {
         movie.setId(-1L);
         movie.setName("Inception 2");
         movie.setDescription("alter description");
+        Review newReview = new Review();
+        newReview.setAuthor("Gildas").setContent("Test unitaire Content");
+        movie.addReview(newReview);
         Movie mergedMovie = repository.merge(movie);
         assertThat(movie.getName()).as("Le nom du film n'a pas changé").isEqualTo("Inception 2");
+    }
+
+    @Test
+    public void merge_cassimule_with_transient() {
+        Movie movie = new Movie();
+        movie.setName("usual suspect").setDescription("Film incompréhensible.");
+        movie.setCertification(Certification.INTERDIT_MOINS_12);
+        Review review = new Review();
+        review.setAuthor("Gildas").setContent("super film");
+        movie.addReview(review);
+        repository.merge(movie);
+        assertThat(movie.getName()).as("le film n'a pas été créé").isEqualTo("usual suspect");
+        assertThat(movie.getId()).as("L'id n'est pas null... alors qu'avec un merge sur transient").isNull();
     }
 
     @Test
     public void merge_casimule_without_update() {
         Movie movie = new Movie();
         movie.setId(-1L);
-        movie.setName("Inception").setDescription("description init");
+        movie.setName("Inception").setDescription("description init").setCertification(Certification.TOUT_PUBLIC);
         Movie mergedMovie = repository.merge(movie);
         assertThat(movie.getName()).as("Le nom du film n'a pas changé").isEqualTo("Inception");
     }
