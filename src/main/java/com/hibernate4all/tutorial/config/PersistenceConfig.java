@@ -2,9 +2,11 @@ package com.hibernate4all.tutorial.config;
 
 import java.util.Properties;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -15,13 +17,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = {"com.hibernate4all.tutorial"})
+@PropertySource("classpath:application.properties")
 public class PersistenceConfig {
+
+    @Value("${database.url}")
+    private String dataBaseUrl;
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         // pemet de generer le contexte de persistence
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSourcePOSTGRE());
+        em.setDataSource(dataSource());
         em.setPackagesToScan(new String[] { "com.hibernate4all.tutorial.domain" });
         // basé sur hibernate
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
@@ -33,10 +39,10 @@ public class PersistenceConfig {
     }
 
     @Bean
-    public DataSource dataSourcePOSTGRE() {
+    public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/hibernate4all");
+        dataSource.setUrl(dataBaseUrl);
         dataSource.setUsername("postgres");
         dataSource.setPassword("admin");
         return dataSource;
