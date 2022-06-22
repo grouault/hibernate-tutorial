@@ -1,6 +1,6 @@
 -- set REFERENTIAL_INTEGRITY FALSE;
 set session_replication_role to replica;
-truncate table Review, Movie_Genre, Movie, Genre, Movie_Details RESTART IDENTITY;
+truncate table Review, Movie_Genre, Movie, Genre, Movie_Details, Award RESTART IDENTITY;
 set session_replication_role to default;
 --set REFERENTIAL_INTEGRITY TRUE;
 

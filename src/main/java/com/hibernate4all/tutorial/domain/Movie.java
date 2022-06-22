@@ -40,6 +40,9 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<Review>();
 
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Award> awards = new ArrayList<>();
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name="Movie_Genre",
@@ -76,6 +79,22 @@ public class Movie {
         if (genre != null) {
             this.genres.remove(genre);
             genre.getMovies().remove(this);
+        }
+        return this;
+    }
+
+    public Movie addAward(Award award) {
+        if (award != null) {
+            this.awards.add(award);
+            award.setMovie(this);
+        }
+        return this;
+    }
+
+    public Movie removeAward(Award award) {
+        if (award != null) {
+            this.awards.remove(award);
+            award.setMovie(null);
         }
         return this;
     }
@@ -117,6 +136,10 @@ public class Movie {
 
     public List<Review> getReviews() {
         return Collections.unmodifiableList(reviews);
+    }
+
+    public List<Award> getAwards() {
+        return Collections.unmodifiableList(awards);
     }
 
     public Set<Genre> getGenres() {

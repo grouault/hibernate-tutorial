@@ -1,6 +1,7 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.config.PersistenceConfig;
+import com.hibernate4all.tutorial.domain.Award;
 import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Genre;
 import com.hibernate4all.tutorial.domain.Movie;
@@ -16,6 +17,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.checkerframework.checker.units.qual.A;
 import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -193,6 +195,18 @@ public class MovieRepositoryTest {
             LOGGER.trace("chargement des reviews...");
             LOGGER.trace("nombre de movies  : " + movie.getReviews().size());
         });
+    }
+
+    @Test
+    public void association_addAward() {
+        Movie movie = new Movie()
+                .setName("Fight Club")
+                .setCertification(Certification.INTERDIT_MOINS_12)
+                .setDescription("Le Fight Club n'existe pas");
+        Award award = new Award().setName("Prix de la surprise").setDescription("Incredible").setYear(2011);
+        movie.addAward(award);
+        repository.persist(movie);
+        assertThat(award.getId()).as("Award aurait du etre persister avec Movie").isNotNull();
     }
 
 }
