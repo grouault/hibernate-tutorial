@@ -8,8 +8,13 @@ import com.hibernate4all.tutorial.domain.MovieDetails;
 import com.hibernate4all.tutorial.domain.Review;
 import com.hibernate4all.tutorial.service.MovieService;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.validation.Constraint;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Assertions;
@@ -189,7 +194,5 @@ public class MovieRepositoryTest {
             LOGGER.trace("nombre de movies  : " + movie.getReviews().size());
         });
     }
-
-
 
 }
