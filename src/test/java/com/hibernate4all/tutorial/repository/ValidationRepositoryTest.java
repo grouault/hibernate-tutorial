@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -19,6 +21,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class ValidationRepositoryTest {
 
     private static Validator validator;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationRepositoryTest.class);
 
     @BeforeAll
     public static void setUp() {
@@ -31,6 +35,8 @@ public class ValidationRepositoryTest {
         Review review1 = new Review().setContent("Mon nouveau commentaire").setAuthor("Gildas").setRating(12);
         Set<ConstraintViolation<Review>> errors = validator.validate(review1);
         assertThat(errors).as("Seule une erreur est attendue").hasSize(1);
+        ConstraintViolation<Review> constraint = errors.iterator().next();
+        LOGGER.info("Property: " + constraint.getPropertyPath().toString() + " / Erreur: " + constraint.getMessage());
     }
 
 }
