@@ -16,11 +16,9 @@
     <!-- besoin d'afficher les valeus des "?" -->
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
 
-    <!-- logger les classes specifiques -->
-    <logger name="com.hibernate4all.tutorial.repository.MovieRepository" level="TRACE"/>
-
     <!-- observer la gestion des transactions : ouverture / fermeture -->
     <!-- logger name="org.springframework.orm.jpa.JpaTransactionManager" level="DEBUG" /-->
+
     <!--
         SessionImpl : implementation de la session dans les sources hibernate
         observer la gestion des sessions ouverture / fermeture
@@ -31,6 +29,11 @@
         explication du dirty-checking
     -->
     <logger name="org.hibernate.event.internal.DefaultFlushEntityEventListener" level="TRACE"/>
+
+    <!-- logger les classes specifiques -->
+    <logger name="com.hibernate4all.tutorial.repository.MovieRepository" level="TRACE"/>
+    <logger name="com.hibernate4all.tutorial.repository.GenreRepository" level="DEBUG"/>
+    <logger name="com.hibernate4all.tutorial.model.ValidationReviewTest" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

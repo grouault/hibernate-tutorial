@@ -1,6 +1,7 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.domain.Movie;
+import com.hibernate4all.tutorial.domain.MovieDetails;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -27,9 +28,16 @@ public class MovieRepository {
     }
 
     @Transactional
+    public void addMovieDetails(MovieDetails movieDetails, Long idMovie) {
+        Movie movieRef = getReference(idMovie);
+        movieDetails.setMovie(movieRef);
+        entityManager.persist(movieDetails);
+    }
+
+    @Transactional
     public Movie merge(Movie movie){
         Movie result = entityManager.merge(movie);
-        entityManager.contains(result);
+        LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
         return result;
     }
 
