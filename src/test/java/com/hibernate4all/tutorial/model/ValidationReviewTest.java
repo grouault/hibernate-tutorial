@@ -1,4 +1,4 @@
-package com.hibernate4all.tutorial.repository;
+package com.hibernate4all.tutorial.model;
 
 import com.hibernate4all.tutorial.config.PersistenceConfig;
 import com.hibernate4all.tutorial.domain.Review;
@@ -10,6 +10,7 @@ import javax.validation.ValidatorFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +19,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes= {PersistenceConfig.class})
-public class ValidationRepositoryTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class ValidationReviewTest {
 
-    private static Validator validator;
+    private Validator validator;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationRepositoryTest.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ValidationReviewTest.class);
 
     @BeforeAll
-    public static void setUp() {
+    public  void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -38,5 +40,7 @@ public class ValidationRepositoryTest {
         ConstraintViolation<Review> constraint = errors.iterator().next();
         LOGGER.info("Property: " + constraint.getPropertyPath().toString() + " / Erreur: " + constraint.getMessage());
     }
+
+
 
 }

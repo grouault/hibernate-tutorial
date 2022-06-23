@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import org.hibernate.proxy.HibernateProxy;
+import org.springframework.util.StringUtils;
 
 @Entity
 public class Genre {
@@ -46,8 +48,11 @@ public class Genre {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Genre)) return false;
-        Genre othder = (Genre)o;
-        return Objects.equals(this.name, othder.name);
+        Genre other = (Genre)o;
+        if (other instanceof HibernateProxy && this.getId() != null && other.getId() != null) {
+            return Objects.equals(this.id, other.getId());
+        }
+        return Objects.equals(this.name, other.getName());
     }
 
     @Override

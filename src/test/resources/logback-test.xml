@@ -32,7 +32,8 @@
 
     <!-- logger les classes specifiques -->
     <logger name="com.hibernate4all.tutorial.repository.MovieRepository" level="TRACE"/>
-    <logger name="com.hibernate4all.tutorial.repository.ValidationRepositoryTest" level="INFO"/>
+    <logger name="com.hibernate4all.tutorial.repository.GenreRepository" level="DEBUG"/>
+    <logger name="com.hibernate4all.tutorial.model.ValidationReviewTest" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />
