@@ -2,6 +2,7 @@ package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.domain.MovieDetails;
+import com.hibernate4all.tutorial.domain.Review;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -19,6 +20,22 @@ public class MovieRepository {
 
     @PersistenceContext
     EntityManager entityManager;
+
+
+    public Movie find(Long id){
+        Movie result = entityManager.find(Movie.class,id);
+        LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
+        return result;
+    }
+
+    public List<Movie> getAll(){
+        return entityManager.createQuery("from Movie", Movie.class).getResultList();
+    }
+
+    public Movie getReference(Long id) {
+        Movie proxy = entityManager.getReference(Movie.class, id);
+        return proxy;
+    }
 
     @Transactional
     public Movie persist(Movie movie){
@@ -54,18 +71,6 @@ public class MovieRepository {
     }
 
     @Transactional
-    public Movie find(Long id){
-        Movie result = entityManager.find(Movie.class,id);
-        LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
-        return result;
-    }
-
-    @Transactional
-    public List<Movie> getAll(){
-        return entityManager.createQuery("from Movie", Movie.class).getResultList();
-    }
-
-    @Transactional
     public Boolean remove(Long id) {
         Boolean result = false;
         if (id != null) {
@@ -78,11 +83,7 @@ public class MovieRepository {
         return result;
     }
 
-    @Transactional
-    public Movie getReference(Long id) {
-        Movie proxy = entityManager.getReference(Movie.class, id);
-        return proxy;
-    }
+
 
 }
 

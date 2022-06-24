@@ -1,6 +1,8 @@
 package com.hibernate4all.tutorial.domain;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -14,6 +16,12 @@ import org.springframework.util.StringUtils;
 @Entity
 public class Genre {
 
+    public Genre() {}
+
+    public Genre(String name) {
+        this.name = name;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -21,7 +29,7 @@ public class Genre {
     private String name;
 
     @ManyToMany(mappedBy = "genres")
-    private Set<Movie> movies = new HashSet<>();
+    private List<Movie> movies = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -40,7 +48,7 @@ public class Genre {
         return this;
     }
 
-    public Set<Movie> getMovies() {
+    public List<Movie> getMovies() {
         return movies;
     }
 

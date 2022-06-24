@@ -38,7 +38,7 @@ public class Movie {
     // Dans Review, l'attribut Movie correspond à la clé étrangère
     // Qd on sauvegarde un movie, ca va sauvegarder les reviews de ce Movie
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<Review>();
+    private Set<Review> reviews = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Award> awards = new ArrayList<>();
@@ -49,7 +49,7 @@ public class Movie {
         joinColumns = {@JoinColumn(name="movie_id")},
         inverseJoinColumns = {@JoinColumn(name="genre_id")}
     )
-    Set<Genre> genres = new HashSet<>();
+    List<Genre> genres = new ArrayList<>();
 
     public Movie addReview(Review review) {
         if (review != null) {
@@ -80,7 +80,7 @@ public class Movie {
             this.genres.remove(genre);
             genre.getMovies().remove(this);
         }
-        return this;
+                return this;
     }
 
     public Movie addAward(Award award) {
@@ -134,16 +134,16 @@ public class Movie {
         return this;
     }
 
-    public List<Review> getReviews() {
-        return Collections.unmodifiableList(reviews);
+    public Set<Review> getReviews() {
+        return Collections.unmodifiableSet(reviews);
     }
 
     public List<Award> getAwards() {
         return Collections.unmodifiableList(awards);
     }
 
-    public Set<Genre> getGenres() {
-        return Collections.unmodifiableSet(genres);
+    public List<Genre> getGenres() {
+        return Collections.unmodifiableList(genres);
     }
 
     @Override

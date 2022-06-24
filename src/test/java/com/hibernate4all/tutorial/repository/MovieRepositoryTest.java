@@ -209,4 +209,16 @@ public class MovieRepositoryTest {
         assertThat(award.getId()).as("Award aurait du etre persister avec Movie").isNotNull();
     }
 
+    @Test
+    public void addReview() {
+        Movie movie = repository.getReference(-1L);
+        service.addReview(movie.getId(), new Review().setAuthor("Gildas").setContent("super"));
+    }
+
+    @Test
+    public void removeGenre() {
+        Movie movie = repository.getReference(-1L);
+        service.removeGenre(movie.getId(), new Genre("Action"));
+    }
+
 }

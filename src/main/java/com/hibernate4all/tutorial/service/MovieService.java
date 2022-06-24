@@ -1,6 +1,8 @@
 package com.hibernate4all.tutorial.service;
 
+import com.hibernate4all.tutorial.domain.Genre;
 import com.hibernate4all.tutorial.domain.Movie;
+import com.hibernate4all.tutorial.domain.Review;
 import com.hibernate4all.tutorial.repository.MovieRepository;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,18 @@ public class MovieService {
 
     public Movie addMovie(Movie movie){
         return movieRepository.persist(movie);
+    }
+
+    @Transactional
+    public void addReview(Long idMovie, Review review) {
+        Movie movieBd = movieRepository.getReference(idMovie);
+        movieBd.addReview(review);
+    }
+
+    @Transactional
+    public void removeGenre(Long idMovie, Genre genre) {
+        Movie movie = movieRepository.getReference(idMovie);
+        movie.removeGenre(genre);
     }
 
     public Optional<Movie> updateMovie(Movie movie) {
