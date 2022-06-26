@@ -45,7 +45,7 @@ public class MovieController {
 
     @PostMapping(path = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Movie addMovie(@RequestBody Movie movie) {
-        return movieService.addMovie(movie);
+        return movieService.persist(movie);
     }
 
     @PutMapping("/")

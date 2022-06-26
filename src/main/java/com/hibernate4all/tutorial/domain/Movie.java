@@ -3,14 +3,15 @@ package com.hibernate4all.tutorial.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,18 +52,27 @@ public class Movie {
     )
     List<Genre> genres = new ArrayList<>();
 
-    public Movie addReview(Review review) {
-        if (review != null) {
-            this.reviews.add(review);
-            review.setMovie(this);
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<MovieActor> moviesActors = new ArrayList<>();
+
+    public void addActor(Actor actor, String character) {
+        MovieActor movieActor = new MovieActor(this, actor).setCharacter(character);
+        this.moviesActors.add(movieActor);
+        actor.getMoviesActors().add(movieActor);
+    }
+
+    public Movie addAward(Award award) {
+        if (award != null) {
+            this.awards.add(award);
+            award.setMovie(this);
         }
         return this;
     }
 
-    public Movie removeReview(Review review) {
+    public Movie addReview(Review review) {
         if (review != null) {
-            this.reviews.remove(review);
-            review.setMovie(null);
+            this.reviews.add(review);
+            review.setMovie(this);
         }
         return this;
     }
@@ -75,6 +85,37 @@ public class Movie {
         return this;
     }
 
+    public Movie removeAward(Award award) {
+        if (award != null) {
+            this.awards.remove(award);
+            award.setMovie(null);
+        }
+        return this;
+    }
+
+    public Movie removeActor(Actor actor) {
+        if (actor != null) {
+            for (Iterator<MovieActor> iter = moviesActors.iterator(); iter.hasNext();) {
+                MovieActor movieActor = iter.next();
+                if (movieActor.getMovie().equals(this) && movieActor.getActor().equals(actor)) {
+                    iter.remove();
+                    movieActor.getActor().getMoviesActors().remove(movieActor);
+                    movieActor.setActor(null);
+                    movieActor.setMovie(null);
+                }
+            }
+        }
+        return this;
+    }
+
+    public Movie removeReview(Review review) {
+        if (review != null) {
+            this.reviews.remove(review);
+            review.setMovie(null);
+        }
+        return this;
+    }
+
     public Movie removeGenre(Genre genre) {
         if (genre != null) {
             this.genres.remove(genre);
@@ -83,20 +124,13 @@ public class Movie {
                 return this;
     }
 
-    public Movie addAward(Award award) {
-        if (award != null) {
-            this.awards.add(award);
-            award.setMovie(this);
+    public void updateActor(Actor actorBd, String character) {
+        Optional<MovieActor> movieActor = this.moviesActors.stream().filter(
+                ma -> ma.getActor().equals(actorBd) && ma.getMovie().equals(this)
+        ).findFirst();
+        if (!movieActor.isEmpty()) {
+            movieActor.get().setCharacter(character);
         }
-        return this;
-    }
-
-    public Movie removeAward(Award award) {
-        if (award != null) {
-            this.awards.remove(award);
-            award.setMovie(null);
-        }
-        return this;
     }
 
     public Long getId() {
@@ -144,6 +178,10 @@ public class Movie {
 
     public List<Genre> getGenres() {
         return Collections.unmodifiableList(genres);
+    }
+
+    public List<MovieActor> getMoviesActors() {
+        return Collections.unmodifiableList(moviesActors);
     }
 
     @Override

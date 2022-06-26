@@ -1,10 +1,13 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.config.PersistenceConfig;
+import com.hibernate4all.tutorial.config.PersistenceConfigTest;
+import com.hibernate4all.tutorial.domain.Actor;
 import com.hibernate4all.tutorial.domain.Award;
 import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Genre;
 import com.hibernate4all.tutorial.domain.Movie;
+import com.hibernate4all.tutorial.domain.MovieActor;
 import com.hibernate4all.tutorial.domain.MovieDetails;
 import com.hibernate4all.tutorial.domain.Review;
 import com.hibernate4all.tutorial.service.MovieService;
@@ -34,10 +37,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 // doit s'executer dans le contexte Spring
 @ExtendWith(SpringExtension.class)
 // donner les classes de config dont spring a besoin pour s'initialiser
-@ContextConfiguration(classes= {PersistenceConfig.class})
+@ContextConfiguration(classes= {PersistenceConfigTest.class})
 // charger les données de test
-@SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
-@Sql({"/datas/datas-test-postgre.sql"})
+@SqlConfig(dataSource = "dataSourceH2", transactionManager = "transactionManager")
+@Sql({"/datas/datas-test.sql"})
 public class MovieRepositoryTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepository.class);
@@ -52,16 +55,6 @@ public class MovieRepositoryTest {
     EntityManager entityManager;
 
     @Test
-    public void save_casNominal(){
-        Movie movie = new Movie();
-        movie.setName("Inception V2");
-        movie.setCertification(Certification.INTERDIT_MOINS_12);
-        repository.persist(movie);
-        System.out.println("[save_CasNominal] - session contains movie : " + entityManager.contains(movie));
-        System.out.println("fin de test");
-    }
-
-    @Test
     public void addMovieDetails_casNominal(){
         MovieDetails details = new MovieDetails().setPlot("Intrique du film Memento très longue!");
         repository.addMovieDetails(details, -2L);
@@ -69,26 +62,42 @@ public class MovieRepositoryTest {
     }
 
     @Test
-    public void save_withGenres() {
-        Movie movie = new Movie().setName("The Social Network");
-        Genre bio = new Genre().setName("Biography");
-        Genre drama = new Genre().setName("Drama");
-        movie.addGenre(bio).addGenre(drama);
+    public void association_casNominal() {
+        Movie movie = new Movie().setName("Fight Club")
+                                 .setCertification(Certification.INTERDIT_MOINS_12)
+                                 .setDescription("Le Fight Club n'existe pas");
+        Review review1 = new Review().setAuthor("max").setContent("super film!");
+        Review review2 = new Review().setAuthor("jp").setContent("au top!");
+        movie.addReview(review1);
+        movie.addReview(review2);
         repository.persist(movie);
-        assertThat(bio.getId()).as("l'entité Genre aurait dû être persistée").isNotNull();
     }
 
     @Test
-    public void save_withExistingGenres() {
-        Movie movie = new Movie().setName("The Social Network");
-        Genre bio = new Genre().setName("Biography");
-        Genre drama = new Genre().setName("Drama");
-        Genre action = new Genre().setName("Action");
-        action.setId(-1L);
-        movie.addGenre(bio).addGenre(drama).addGenre(action);
-        repository.merge(movie);
-        // Attention avec Merge
-        // assertThat(bio.getId()).as("l'entité Genre aurait dû être persistée").isNotNull();
+    public void associationGet_fail(){
+        Assertions.assertThrows(LazyInitializationException.class, () -> {
+            Movie movie = repository.find(-1L);
+            LOGGER.trace("chargement des reviews...");
+            LOGGER.trace("nombre de movies  : " + movie.getReviews().size());
+        });
+    }
+
+    @Test
+    public void association_addAward() {
+        Movie movie = new Movie()
+                .setName("Fight Club")
+                .setCertification(Certification.INTERDIT_MOINS_12)
+                .setDescription("Le Fight Club n'existe pas");
+        Award award = new Award().setName("Prix de la surprise").setDescription("Incredible").setYear(2011);
+        movie.addAward(award);
+        repository.persist(movie);
+        assertThat(award.getId()).as("Award aurait du etre persister avec Movie").isNotNull();
+    }
+
+    @Test
+    public void addReview_existingMovie() {
+        Movie movie = repository.getReference(-1L);
+        service.addReview(movie.getId(), new Review().setAuthor("Gildas").setContent("super"));
     }
 
     @Test
@@ -139,19 +148,7 @@ public class MovieRepositoryTest {
         assertThat(movies).as("l'ensemble des films n'a pas été récupéré").hasSize(2);
     }
 
-    @Test
-    public void remove(){
-        repository.remove(-1L);
-        List<Movie> movies = repository.getAll();
-        assertThat(movies).as("le film n'a pas été supprimé").hasSize(1);
-    }
 
-    @Test
-    public void removeAndGetAll() {
-        List<Movie> movies = service.removeAndGetAll(-1L);
-        assertThat(movies).as("le film n'a pas été supprimé").hasSize(1);
-
-    }
 
     @Test
     public void getReference_casNominal(){
@@ -177,48 +174,56 @@ public class MovieRepositoryTest {
     }
 
     @Test
-    public void association_casNominal() {
-        Movie movie = new Movie().setName("Fight Club")
-                      .setCertification(Certification.INTERDIT_MOINS_12)
-                      .setDescription("Le Fight Club n'existe pas");
-        Review review1 = new Review().setAuthor("max").setContent("super film!");
-        Review review2 = new Review().setAuthor("jp").setContent("au top!");
-        movie.addReview(review1);
-        movie.addReview(review2);
-        repository.persist(movie);
+    public void remove(){
+        repository.remove(-1L);
+        List<Movie> movies = repository.getAll();
+        assertThat(movies).as("le film n'a pas été supprimé").hasSize(1);
     }
 
     @Test
-    public void associationGet_fail(){
-        Assertions.assertThrows(LazyInitializationException.class, () -> {
-            Movie movie = repository.find(-1L);
-            LOGGER.trace("chargement des reviews...");
-            LOGGER.trace("nombre de movies  : " + movie.getReviews().size());
-        });
-    }
+    public void removeAndGetAll() {
+        List<Movie> movies = service.removeAndGetAll(-1L);
+        assertThat(movies).as("le film n'a pas été supprimé").hasSize(1);
 
-    @Test
-    public void association_addAward() {
-        Movie movie = new Movie()
-                .setName("Fight Club")
-                .setCertification(Certification.INTERDIT_MOINS_12)
-                .setDescription("Le Fight Club n'existe pas");
-        Award award = new Award().setName("Prix de la surprise").setDescription("Incredible").setYear(2011);
-        movie.addAward(award);
-        repository.persist(movie);
-        assertThat(award.getId()).as("Award aurait du etre persister avec Movie").isNotNull();
-    }
-
-    @Test
-    public void addReview() {
-        Movie movie = repository.getReference(-1L);
-        service.addReview(movie.getId(), new Review().setAuthor("Gildas").setContent("super"));
     }
 
     @Test
     public void removeGenre() {
         Movie movie = repository.getReference(-1L);
-        service.removeGenre(movie.getId(), new Genre("Action"));
+            service.removeGenre(movie.getId(), new Genre("Action"));
+    }
+
+    @Test
+    public void save_casNominal(){
+        Movie movie = new Movie();
+        movie.setName("Inception V2");
+        movie.setCertification(Certification.INTERDIT_MOINS_12);
+        repository.persist(movie);
+        System.out.println("[save_CasNominal] - session contains movie : " + entityManager.contains(movie));
+        System.out.println("fin de test");
+    }
+
+    @Test
+    public void save_withGenres() {
+        Movie movie = new Movie().setName("The Social Network");
+        Genre bio = new Genre().setName("Biography");
+        Genre drama = new Genre().setName("Drama");
+        movie.addGenre(bio).addGenre(drama);
+        repository.persist(movie);
+        assertThat(bio.getId()).as("l'entité Genre aurait dû être persistée").isNotNull();
+    }
+
+    @Test
+    public void save_withExistingGenres() {
+        Movie movie = new Movie().setName("The Social Network");
+        Genre bio = new Genre().setName("Biography");
+        Genre drama = new Genre().setName("Drama");
+        Genre action = new Genre().setName("Action");
+        action.setId(-1L);
+        movie.addGenre(bio).addGenre(drama).addGenre(action);
+        repository.merge(movie);
+        // Attention avec Merge
+        // assertThat(bio.getId()).as("l'entité Genre aurait dû être persistée").isNotNull();
     }
 
 }

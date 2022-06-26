@@ -15,5 +15,5 @@ insert into Genre(name, id) values ('Sci-Fi', -2);
 insert into Genre(name, id) values ('Drame', -3);
 
 insert into Movie_Genre(genre_id,movie_id) values(-1, -1);
-insert into Movie_Genre(genre_id,movie_id) values(-2, -1);
+insert into Movie_Genre(genre_id,movie_id) values(-2,   -1);
 insert into Movie_Genre(genre_id,movie_id) values(-3, -1);
