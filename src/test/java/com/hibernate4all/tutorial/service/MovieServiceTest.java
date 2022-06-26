@@ -1,7 +1,6 @@
 package com.hibernate4all.tutorial.service;
 
 import com.hibernate4all.tutorial.config.PersistenceConfig;
-import com.hibernate4all.tutorial.config.PersistenceConfigTest;
 import com.hibernate4all.tutorial.domain.Actor;
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.repository.ActorRepository;
@@ -15,9 +14,9 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes= {PersistenceConfigTest.class})
-@SqlConfig(dataSource = "dataSourceH2", transactionManager = "transactionManager")
-@Sql({"/datas/datas-test.sql"})
+@ContextConfiguration(classes= {PersistenceConfig.class})
+@SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
+@Sql({"/datas/datas-test-postgre.sql"})
 public class MovieServiceTest {
 
     @Autowired

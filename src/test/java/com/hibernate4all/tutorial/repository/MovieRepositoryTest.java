@@ -1,26 +1,17 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.config.PersistenceConfig;
-import com.hibernate4all.tutorial.config.PersistenceConfigTest;
-import com.hibernate4all.tutorial.domain.Actor;
 import com.hibernate4all.tutorial.domain.Award;
 import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Genre;
 import com.hibernate4all.tutorial.domain.Movie;
-import com.hibernate4all.tutorial.domain.MovieActor;
 import com.hibernate4all.tutorial.domain.MovieDetails;
 import com.hibernate4all.tutorial.domain.Review;
 import com.hibernate4all.tutorial.service.MovieService;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.validation.Constraint;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.checkerframework.checker.units.qual.A;
 import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,10 +28,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 // doit s'executer dans le contexte Spring
 @ExtendWith(SpringExtension.class)
 // donner les classes de config dont spring a besoin pour s'initialiser
-@ContextConfiguration(classes= {PersistenceConfigTest.class})
+@ContextConfiguration(classes= {PersistenceConfig.class})
 // charger les données de test
-@SqlConfig(dataSource = "dataSourceH2", transactionManager = "transactionManager")
-@Sql({"/datas/datas-test.sql"})
+@SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
+@Sql({"/datas/datas-test-postgre.sql"})
 public class MovieRepositoryTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepository.class);
