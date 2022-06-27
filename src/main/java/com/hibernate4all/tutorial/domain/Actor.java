@@ -67,11 +67,6 @@ public class Actor {
         return moviesActors;
     }
 
-    public Actor setMoviesActors(List<MovieActor> moviesActors) {
-        this.moviesActors = moviesActors;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
 

@@ -10,7 +10,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="movie_actor")
-public class MovieActor {
+public class
+MovieActor {
 
     @EmbeddedId
     private MovieActorId id;
