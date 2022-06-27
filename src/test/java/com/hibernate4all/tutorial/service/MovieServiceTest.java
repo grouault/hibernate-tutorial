@@ -32,14 +32,14 @@ public class MovieServiceTest {
     public void addActor_existingMovie() {
         Movie movie = movieRepository.getReference(-1L);
         Actor actor = new Actor().setName("Eisenberg").setFirstName("Jesse");
-        movieService.addMovieWithActor(movie, actor, "Mark Zuckerberg");
+        movieService.addMovieActor(movie, actor, "Mark Zuckerberg");
     }
 
     @Test
     public void associateActorAndFilm() {
         Movie movie = movieRepository.getReference(-1L);
         Actor actor = actorRepository.getReference(-2L);
-        movieService.addMovieWithActor(movie, actor, "Mark Zuckerberg");
+        movieService.addMovieActor(movie, actor, "Mark Zuckerberg");
     }
 
     @Test
@@ -54,7 +54,8 @@ public class MovieServiceTest {
     public void addMovie_existingActor() {
         Movie movie = new Movie().setName("La grande vadrouille").setDescription("film mythique");
         Actor actor = actorRepository.getReference(-3L);
-        movieService.addMovieWithActor(movie, actor, "Augustin Bouvet");
+       movieService.persist(movie, actor, "Augustin Bouvet");
+        // movieService.addMovieWithActor(movie, actor, "Augustin Bouvet");
     }
 
     @Test

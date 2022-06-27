@@ -65,10 +65,8 @@ public class MovieRepository {
 
     @Transactional
     public Movie persistCascadeWithActor(Movie movie, Actor actor, String character){
-        LOGGER.trace("entityManager.contains() : " + entityManager.contains(movie));
-        // Actor actorDb = findActor(actor.getId());
-        // movie.addActor(actorDb, character);
-        Actor actorDb = actorRepository.persist(actor);
+        LOGGER.trace("entityManager.contains() : " + entityManager.contains(movie));;
+        Actor actorDb = actor.getId() != null ? actorRepository.find(actor.getId()) : actorRepository.persist(actor);
         movie.addActor(actorDb, character);
         entityManager.persist(movie);
         return movie;

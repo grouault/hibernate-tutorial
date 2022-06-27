@@ -28,13 +28,6 @@ public class MovieService {
         return movie;
     }
 
-    @Transactional
-    public void addActor(Movie movie, Actor actor, String character) {
-        Movie movieBd = movieRepository.find(movie.getId());
-        Actor actorBd = actorRepository.find(actor.getId());
-        movieBd.addActor(actorBd, character);
-    }
-
     /**
      * associe un acteur à un film
      *
@@ -47,7 +40,7 @@ public class MovieService {
      * @return
      */
     @Transactional
-    public Movie addMovieWithActor(Movie movie, Actor actor, String character) {
+    public Movie addMovieActor(Movie movie, Actor actor, String character) {
         Actor actorDb = actor.getId() != null ? actorRepository.find(actor.getId()) : actorRepository.persist(actor);
         Movie movieDb = movie.getId() != null ? movieRepository.find(movie.getId()) : movieRepository.persist(movie);
         movieDb.addActor(actorDb, character);
@@ -64,7 +57,7 @@ public class MovieService {
      * @return
      */
     @Transactional
-    public Movie addMovieCascadeWithActor(Movie movie, Actor actor, String character) {
+    public Movie addMovieActorCascade(Movie movie, Actor actor, String character) {
         Actor actorDb = actor.getId() != null ? actorRepository.find(actor.getId()) : actorRepository.persist(actor);
         movie.addActor(actorDb, character);
         return movieRepository.persist(movie);
