@@ -11,6 +11,8 @@ import com.hibernate4all.tutorial.service.MovieService;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Table;
+import javax.transaction.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Assertions;
@@ -134,17 +136,28 @@ public class MovieRepositoryTest {
     }
 
     @Test
+    public void find_byName(){
+        List<Movie> movies = repository.findByName("Inception");
+        assertThat(movies).hasSize(1);
+        assertThat(movies.get(0).getName()).isEqualTo("Inception");
+    }
+
+    @Test
+    public void find_withCertification(){
+        List<Movie> result = repository.findWithCertification("<=", Certification.INTERDIT_MOINS_12);
+        assertThat(result).hasSize(3);
+    }
+
+    @Test
     public void getAll_casNominal(){
         List<Movie> movies = repository.getAll();
         assertThat(movies).as("l'ensemble des films n'a pas été récupéré").hasSize(2);
     }
 
-
-
     @Test
     public void getReference_casNominal(){
         Movie movie = repository.getReference(-2L);
-        assertThat(movie.getId()).as("la référence n'a pas été correctement chargée").isEqualTo(-2L);
+        LOGGER.info(movie.getName());
     }
 
     @Test

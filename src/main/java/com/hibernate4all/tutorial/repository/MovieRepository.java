@@ -1,14 +1,20 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.domain.Actor;
+import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.domain.MovieActor;
 import com.hibernate4all.tutorial.domain.MovieDetails;
+import com.hibernate4all.tutorial.domain.Movie_;
 import com.hibernate4all.tutorial.domain.Review;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -27,15 +33,6 @@ public class MovieRepository {
     @Autowired
     private ActorRepository actorRepository;
 
-    public List<Movie> getAll(){
-        return entityManager.createQuery("from Movie", Movie.class).getResultList();
-    }
-
-    public Movie getReference(Long id) {
-        Movie proxy = entityManager.getReference(Movie.class, id);
-        return proxy;
-    }
-
     @Transactional
     public void addMovieDetails(MovieDetails movieDetails, Long idMovie) {
         Movie movieRef = getReference(idMovie);
@@ -47,6 +44,44 @@ public class MovieRepository {
         Movie result = entityManager.find(Movie.class,id);
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
         return result;
+    }
+
+    public List<Movie> findByName(String searchString) {
+        List<Movie> movies = entityManager.createQuery("select m from Movie m where m.name = : param", Movie.class)
+                .setParameter("param", searchString).getResultList();
+        return  movies;
+    }
+
+    public List<Movie> findWithCertification(String operation, Certification certif) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
+        // creation d'une racine qui represente ce qu'il y a dans le Select
+        Root<Movie> root = query.from(Movie.class); // equivalent select m from Movie
+        Predicate predicat;
+        if ("<".equals(operation)) {
+            predicat= builder.lessThan(root.get(Movie_.CERTIFICATION), certif);
+        } else if("<=".equals(operation)) {
+           predicat = builder.lessThanOrEqualTo(root.get(Movie_.CERTIFICATION), certif);
+        } else if("=".equals(operation)) {
+            predicat = builder.equal(root.get(Movie_.CERTIFICATION), certif);
+        } else if(">".equals(operation)) {
+            predicat = builder.greaterThan(root.get(Movie_.CERTIFICATION), certif);
+        } else if(">=".equals(operation)) {
+            predicat = builder.greaterThanOrEqualTo(root.get(Movie_.CERTIFICATION), certif);
+        } else {
+            throw new IllegalArgumentException("valeur de paramètre de recherche incorreect");
+        }
+        query.where(predicat);
+
+        return  entityManager.createQuery(query).getResultList();
+    }
+
+    public List<Movie> getAll(){
+        return entityManager.createQuery("from Movie", Movie.class).getResultList();
+    }
+
+    public Movie getReference(Long id) {
+        return entityManager.getReference(Movie.class, id);
     }
 
     @Transactional
