@@ -1,6 +1,7 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.domain.Actor;
+import com.hibernate4all.tutorial.domain.Award;
 import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.domain.MovieActor;
@@ -10,13 +11,18 @@ import com.hibernate4all.tutorial.domain.Review;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
+import javax.persistence.QueryHint;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.jpa.QueryHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +32,9 @@ import org.springframework.stereotype.Repository;
 public class MovieRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepository.class);
+
+    @PersistenceUnit
+    EntityManagerFactory entityManagerFactory;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -76,8 +85,48 @@ public class MovieRepository {
         return  entityManager.createQuery(query).getResultList();
     }
 
+    public List<Movie> getMoviesWithReview(){
+        return entityManager
+                .createQuery("select distinct m from Movie m left join fetch m.reviews", Movie.class)
+                .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                .getResultList();
+    }
+
+    public List<Movie> getMoviesWithAwardsAndReviews(){
+
+        EntityManager entityManagerLocal = entityManagerFactory.createEntityManager();
+
+        List<Movie> movies = entityManagerLocal
+                .createQuery("select distinct m from Movie m left join fetch m.reviews", Movie.class)
+                .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                .getResultList();
+
+        LOGGER.trace("session contains movie2 : " + entityManagerLocal.contains(movies.get(0)));
+
+        movies = entityManagerLocal
+                .createQuery("select distinct m from Movie m left join fetch m.awards where m in :movies", Movie.class)
+                .setParameter("movies", movies)
+                .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                .getResultList();
+
+        entityManagerLocal.close();
+
+        return movies;
+
+    }
+
     public List<Movie> getAll(){
         return entityManager.createQuery("from Movie", Movie.class).getResultList();
+    }
+
+    public List<MovieDetails> getAllMovieDetail() {
+        // on charge les MovieDetails pour mise dans le cache
+        List<MovieDetails> moviesDetails = entityManager.createQuery("select md from MovieDetails md", MovieDetails.class).getResultList();
+        // chargement des movies.
+        moviesDetails = entityManager
+                .createQuery("select md from MovieDetails md join fetch md.movie where md in :movieDetails ", MovieDetails.class)
+                .setParameter("movieDetails", moviesDetails).getResultList();
+        return moviesDetails;
     }
 
     public Movie getReference(Long id) {

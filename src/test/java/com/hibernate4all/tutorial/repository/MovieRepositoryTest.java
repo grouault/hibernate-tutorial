@@ -149,15 +149,38 @@ public class MovieRepositoryTest {
     }
 
     @Test
+    public void getMoviesWithReviews_casNominal(){
+        List<Movie> movies = repository.getMoviesWithReview();
+        assertThat(movies).as("il devrait y avoir 3 films récupérés").hasSize(3);
+        Movie inception = movies.stream().filter(m -> m.getId().equals(-1L)).findFirst().get();
+        assertThat(inception.getReviews()).as("les reviews n'ont pas été correctement récupérés.").hasSize(3);
+    }
+
+    @Test
+    public void getMoviesWithAwardsAndReviews_casNominal(){
+        List<Movie> movies = repository.getMoviesWithAwardsAndReviews();
+        assertThat(movies).as("il devrait y avoir 3 films récupérés").hasSize(3);
+        Movie inception = movies.stream().filter(m -> m.getId().equals(-1L)).findFirst().get();
+        assertThat(inception.getReviews()).as("les reviews n'ont pas été correctement récupérés.").hasSize(2);
+    }
+
+    @Test
     public void getAll_casNominal(){
         List<Movie> movies = repository.getAll();
-        assertThat(movies).as("l'ensemble des films n'a pas été récupéré").hasSize(2);
+        assertThat(movies).as("l'ensemble des films n'a pas été récupéré.").hasSize(2);
+    }
+
+    @Test
+    @Sql({"/datas/datas-test-n+1.sql"})
+    public void getAllMovieDetails(){
+        List<MovieDetails> movieDetails = repository.getAllMovieDetail();
+        assertThat(movieDetails).as("le nombre de MovieDetails devrait être de 3").hasSize(3);
     }
 
     @Test
     public void getReference_casNominal(){
         Movie movie = repository.getReference(-2L);
-        LOGGER.info(movie.getName());
+        assertThat(movie.getId()).as("la référence n'a pas été correctement chargée").isEqualTo(-2L);
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.hibernate4all.tutorial.domain;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
@@ -18,7 +19,7 @@ public class MovieDetails {
     @Column(length=4000)
     private String plot;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     private Movie movie;
 

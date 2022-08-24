@@ -62,6 +62,7 @@ public class PersistenceConfig {
         // tables, en fonction des entités déclarées
         properties.setProperty("hibernate.hbm2ddl.auto", "none");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        // properties.setProperty("hibernate.format_sql", "true");
         return properties;
     }
 
