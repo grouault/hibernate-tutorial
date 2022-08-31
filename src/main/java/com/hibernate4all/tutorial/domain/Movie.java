@@ -20,6 +20,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 @Entity
 @Table(name="Movie")
@@ -31,6 +32,9 @@ public class Movie {
 
     @Column(unique = true)
     private String name;
+
+    @Version
+    private short version;
 
     private String description;
 

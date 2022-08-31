@@ -8,12 +8,16 @@ import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.domain.MovieDetails;
 import com.hibernate4all.tutorial.domain.Review;
 import com.hibernate4all.tutorial.service.MovieService;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.INPUT_STREAM;
 import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes= {PersistenceConfig.class})
 // charger les données de test
 @SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
-@Sql({"/datas/datas-test-postgre.sql"})
+//@Sql({"/datas/datas-test-bulk.sql"})
 public class MovieRepositoryTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepository.class);
@@ -175,6 +179,36 @@ public class MovieRepositoryTest {
     public void getAllMovieDetails(){
         List<MovieDetails> movieDetails = repository.getAllMovieDetail();
         assertThat(movieDetails).as("le nombre de MovieDetails devrait être de 3").hasSize(3);
+    }
+
+    @Test
+    // @Sql({"/datas/datas-test-bulk.sql"})
+    public void getAllMovieBulk_casNominal(){
+        Instant now = Instant.now();
+        List<Movie> movies = repository.getAll();
+        Duration duration = Duration.between(now, Instant.now());
+        LOGGER.info("durée : {}", duration.toMillis() );
+        assertThat(movies).as("Les movies n'ont pas été chargées correctement").hasSize(1000000);
+    }
+
+    @Test
+    //@Sql({"/datas/datas-test-bulk.sql"})
+    public void getAllMovieBulk_casPaging(){
+        Instant now = Instant.now();
+        List<Movie> movies = repository.getMoviesPager(100,50);
+        Duration duration = Duration.between(now, Instant.now());
+        LOGGER.info("durée : {}", duration.toMillis() );
+        assertThat(movies).as("Les movies n'ont pas été chargées correctement").hasSize(50);
+    }
+
+    @Test
+    //@Sql({"/datas/datas-test-bulk.sql"})
+    public void getAllMovieBulk_casPagingWithReviews(){
+        Instant now = Instant.now();
+        List<Movie> movies = repository.getMoviesWithReviewsPager(100,50);
+        Duration duration = Duration.between(now, Instant.now());
+        LOGGER.info("durée : {}", duration.toMillis() );
+        assertThat(movies).as("Les movies n'ont pas été chargées correctement").hasSize(50);
     }
 
     @Test

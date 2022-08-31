@@ -1,32 +1,28 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.domain.Actor;
-import com.hibernate4all.tutorial.domain.Award;
 import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Movie;
-import com.hibernate4all.tutorial.domain.MovieActor;
 import com.hibernate4all.tutorial.domain.MovieDetails;
 import com.hibernate4all.tutorial.domain.Movie_;
-import com.hibernate4all.tutorial.domain.Review;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import javax.persistence.QueryHint;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
+import org.hibernate.LockOptions;
 import org.hibernate.jpa.QueryHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class MovieRepository {
@@ -49,9 +45,17 @@ public class MovieRepository {
         entityManager.persist(movieDetails);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Movie find(Long id){
         Movie result = entityManager.find(Movie.class,id);
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
+        Movie result2 = entityManager.find(Movie.class, id);
+        Movie idem = entityManager.createQuery("select m from Movie m where m.id = :id", Movie.class)
+                                  .setParameter("id", id)
+                                  .getSingleResult();
+        Movie idem2 = entityManager.createQuery("select m from Movie m where m.id = :id", Movie.class)
+                                   .setParameter("id", id)
+                                   .getSingleResult();
         return result;
     }
 
@@ -119,6 +123,38 @@ public class MovieRepository {
         return entityManager.createQuery("from Movie", Movie.class).getResultList();
     }
 
+
+    public List<Movie> getMoviesPager(int start, int maxResults){
+
+        List<Movie> movies = entityManager.createQuery(" select m from Movie m order by m.name", Movie.class)
+                                .setFirstResult(start)
+                                .setMaxResults(maxResults)
+                                .getResultList();
+        return movies;
+
+    }
+
+    public List<Movie> getMoviesWithReviewsPager(int start, int maxResults){
+
+        EntityManager entityManagerLocal = entityManagerFactory.createEntityManager();
+
+        List<Movie> movies = entityManagerLocal.createQuery(" select m from Movie m order by m.name", Movie.class)
+                                               .setFirstResult(start)
+                                               .setMaxResults(maxResults)
+                                               .getResultList();
+
+        movies = entityManagerLocal.createQuery(" select  distinct m from Movie m left join fetch m.reviews where m in :movies", Movie.class)
+                                   .setParameter("movies", movies)
+                                   .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                                   .getResultList();
+
+        entityManagerLocal.close();
+
+        return movies;
+
+
+    }
+
     public List<MovieDetails> getAllMovieDetail() {
         // on charge les MovieDetails pour mise dans le cache
         List<MovieDetails> moviesDetails = entityManager.createQuery("select md from MovieDetails md", MovieDetails.class).getResultList();
@@ -130,10 +166,11 @@ public class MovieRepository {
     }
 
     public Movie getReference(Long id) {
-        return entityManager.getReference(Movie.class, id);
+        Movie movie = entityManager.getReference(Movie.class, id);
+        LOGGER.info("getReferecne");
+        return movie;
     }
 
-    @Transactional
     public Movie merge(Movie movie){
         Movie result = entityManager.merge(movie);
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));

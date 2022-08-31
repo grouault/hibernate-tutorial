@@ -17,13 +17,14 @@
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
 
     <!-- observer la gestion des transactions : ouverture / fermeture -->
-    <!-- logger name="org.springframework.orm.jpa.JpaTransactionManager" level="DEBUG" / -->
+    <logger name="org.springframework.orm.jpa.JpaTransactionManager" level="DEBUG" />
 
     <!--
         SessionImpl : implementation de la session dans les sources hibernate
         observer la gestion des sessions ouverture / fermeture
+        observer les flush
     -->
-    <!-- logger name="org.hibernate.internal.SessionImpl" level="TRACE" / -->
+    <!-- logger name="org.hibernate.internal.SessionImpl" level="TRACE" /-->
 
     <!-- mecanisme de flux par defaut
         explication du dirty-checking
@@ -34,6 +35,7 @@
     <logger name="com.hibernate4all.tutorial.repository.MovieRepository" level="TRACE"/>
     <logger name="com.hibernate4all.tutorial.repository.GenreRepository" level="DEBUG"/>
     <logger name="com.hibernate4all.tutorial.model.ValidationReviewTest" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

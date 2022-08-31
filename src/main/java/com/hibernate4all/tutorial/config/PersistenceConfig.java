@@ -3,6 +3,7 @@ package com.hibernate4all.tutorial.config;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +47,14 @@ public class PersistenceConfig {
         dataSource.setUsername("postgres");
         dataSource.setPassword("admin");
         return dataSource;
+        // création d'un pool de connexion
+        /*
+        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.driverClassName("org.postgresql.Driver").url(dataBaseUrl).username("postgres").password("admin");
+        return dataSourceBuilder.build();
+        */
     }
+
 
     @Bean
     public PlatformTransactionManager transactionManager() {
@@ -62,7 +70,7 @@ public class PersistenceConfig {
         // tables, en fonction des entités déclarées
         properties.setProperty("hibernate.hbm2ddl.auto", "none");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        // properties.setProperty("hibernate.format_sql", "true");
+        properties.setProperty("hibernate.format_sql", "true");
         return properties;
     }
 

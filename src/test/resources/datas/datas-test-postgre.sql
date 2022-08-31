@@ -4,9 +4,9 @@ truncate table Review, Movie_Genre, Movie, Genre, Actor, Movie_Details, Movie_Ac
 set session_replication_role to default;
 --set REFERENTIAL_INTEGRITY TRUE;
 
-insert into Movie(name, description, id, certification) values('Inception', 'description init', -1, 1);
-insert into Movie(name, description, id, certification) values('Memento', 'description init', -2, 2);
-insert into Movie(name, description, id, certification) values('test', 'test', -3, 2);
+insert into Movie(name, description, id, certification, version) values('Inception', 'description init', -1, 1, 0);
+insert into Movie(name, description, id, certification, version) values('Memento', 'description init', -2, 2, 0);
+insert into Movie(name, description, id, certification, version) values('test', 'test', -3, 2, 0);
 
 insert into Review (author, content, movie_id, id) values ('max', 'au top', -1, -1);
 insert into Review (author, content, movie_id, id) values ('ernest', 'bof bof', -1, -2);

@@ -5,6 +5,7 @@ import com.hibernate4all.tutorial.domain.Actor;
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.repository.ActorRepository;
 import com.hibernate4all.tutorial.repository.MovieRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes= {PersistenceConfig.class})
@@ -75,6 +77,24 @@ public class MovieServiceTest {
     @Test
     public void updateDescription() {
         movieService.updateDescription(-2L, "super film mais j'ai oublié le pitch");
+    }
+
+    @Test
+    public void updateDescription_fromAdmin1(){
+        movieService.updateDescription(-1L, "desc from admin 1");
+    }
+
+    @Test
+    public void updateDescription_fromAdmin2(){
+        movieService.updateDescription(-1L, "desc from admin 2");
+    }
+
+    @Test
+    public void updateMovie() {
+        Movie movie =  movieService.getMovie(-1L);
+        movie.setDescription("titi");
+        Optional<Movie> updatedMovie = movieService.updateMovie(movie);
+        assertThat(updatedMovie.get().getDescription()).as("la description n'est pas correcte").isEqualTo("titi");
     }
 
 }
