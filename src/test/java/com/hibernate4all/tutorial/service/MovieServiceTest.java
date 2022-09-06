@@ -3,6 +3,7 @@ package com.hibernate4all.tutorial.service;
 import com.hibernate4all.tutorial.config.PersistenceConfig;
 import com.hibernate4all.tutorial.domain.Actor;
 import com.hibernate4all.tutorial.domain.Movie;
+import com.hibernate4all.tutorial.dto.MovieDTO;
 import com.hibernate4all.tutorial.repository.ActorRepository;
 import com.hibernate4all.tutorial.repository.MovieRepository;
 import java.util.Optional;
@@ -91,7 +92,7 @@ public class MovieServiceTest {
 
     @Test
     public void updateMovie() {
-        Movie movie =  movieService.getMovie(-1L);
+        Movie movie =  movieRepository.find(-1L);
         movie.setDescription("titi");
         Optional<Movie> updatedMovie = movieService.updateMovie(movie);
         assertThat(updatedMovie.get().getDescription()).as("la description n'est pas correcte").isEqualTo("titi");

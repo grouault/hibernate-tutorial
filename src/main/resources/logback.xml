@@ -11,7 +11,7 @@
     </appender>
 
     <!-- observer les instructions envoyes a la base de donnees -->
-    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <!-- logger name="org.hibernate.SQL" level="DEBUG"/-->
 
     <!-- besoin d'afficher les valeus des "?" -->
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
@@ -31,6 +31,7 @@
         explication du dirty-checking
     -->
     <logger name="org.hibernate.event.internal.DefaultFlushEntityEventListener" level="TRACE"/>
+    <logger name="com.hibernate4all.tutorial" level="DEBUG"/>
 
     <root level="info">
         <appender-ref ref="STDOUT" />

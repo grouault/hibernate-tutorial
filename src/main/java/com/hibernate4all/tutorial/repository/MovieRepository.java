@@ -49,21 +49,16 @@ public class MovieRepository {
     public Movie find(Long id){
         Movie result = entityManager.find(Movie.class,id);
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
-        Movie result2 = entityManager.find(Movie.class, id);
-        Movie idem = entityManager.createQuery("select m from Movie m where m.id = :id", Movie.class)
-                                  .setParameter("id", id)
-                                  .getSingleResult();
-        Movie idem2 = entityManager.createQuery("select m from Movie m where m.id = :id", Movie.class)
-                                   .setParameter("id", id)
-                                   .getSingleResult();
         return result;
     }
 
     public List<Movie> findByName(String searchString) {
-        List<Movie> movies = entityManager.createQuery("select m from Movie m where m.name = : param", Movie.class)
-                .setParameter("param", searchString).getResultList();
+        List<Movie> movies = entityManager.createQuery("select m from Movie m where lower(m.name) like : param", Movie.class)
+                .setParameter("param", '%' +searchString.toLowerCase() +'%').getResultList();
         return  movies;
     }
+
+
 
     public List<Movie> findWithCertification(String operation, Certification certif) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -165,6 +160,33 @@ public class MovieRepository {
         return moviesDetails;
     }
 
+    public MovieDetails getMovieDetails(Long id) {
+
+        MovieDetails movieDetails = entityManager.createQuery("select distinct md from MovieDetails md " +
+                                             " join fetch md.movie m" +
+                                                                 " left join fetch m.reviews " +
+                                                                 " left join fetch m.genres " +
+
+
+                                             " where md.id = :id",
+                                             MovieDetails.class)
+                                     .setParameter("id", id)
+                                     .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                                     .getSingleResult();
+
+        entityManager.createQuery("select distinct m from Movie m left join fetch m.awards where m = :movie", Movie.class)
+                     .setParameter("movie", movieDetails.getMovie())
+                     .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                     .getSingleResult();
+
+        entityManager.createQuery("select distinct m from Movie m left join fetch m.moviesActors where m = :movie", Movie.class)
+                     .setParameter("movie", movieDetails.getMovie())
+                     .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+                     .getSingleResult();
+
+        return movieDetails;
+    }
+
     public Movie getReference(Long id) {
         Movie movie = entityManager.getReference(Movie.class, id);
         LOGGER.info("getReferecne");
@@ -204,6 +226,15 @@ public class MovieRepository {
             }
         }
         return result;
+    }
+
+    public List<Movie> search(String searchText) {
+        List<Movie> movies = entityManager.createQuery(
+                "select m from Movie m " +
+                        " where upper(m.name) like '%' || :searchText || '%' " +
+                        "or upper(m.description) like '%' || :searchText || '%'", Movie.class
+        ).setParameter("searchText", searchText.toUpperCase()).getResultList();
+        return movies;
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.hibernate4all.tutorial.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,6 +25,7 @@ public class Award {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="movie_id")
+    @JsonIgnore
     private Movie movie;
 
     public Long getId() {

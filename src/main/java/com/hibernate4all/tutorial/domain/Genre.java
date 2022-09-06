@@ -1,5 +1,6 @@
 package com.hibernate4all.tutorial.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ public class Genre {
     private String name;
 
     @ManyToMany(mappedBy = "genres")
+    @JsonIgnore
     private List<Movie> movies = new ArrayList<>();
 
     public Long getId() {

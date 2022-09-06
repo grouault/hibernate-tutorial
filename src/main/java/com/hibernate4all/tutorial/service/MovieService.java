@@ -3,14 +3,17 @@ package com.hibernate4all.tutorial.service;
 import com.hibernate4all.tutorial.domain.Actor;
 import com.hibernate4all.tutorial.domain.Genre;
 import com.hibernate4all.tutorial.domain.Movie;
+import com.hibernate4all.tutorial.domain.MovieDetails;
 import com.hibernate4all.tutorial.domain.Review;
+import com.hibernate4all.tutorial.dto.MovieDTO;
+import com.hibernate4all.tutorial.mapper.MovieMapper;
 import com.hibernate4all.tutorial.repository.ActorRepository;
 import com.hibernate4all.tutorial.repository.MovieRepository;
 import java.util.List;
 import java.util.Optional;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MovieService {
@@ -21,11 +24,18 @@ public class MovieService {
     @Autowired
     private ActorRepository actorRepository;
 
-    public Movie getMovie(Long id) {
-        Movie movie = movieRepository.find(id);
-        // Movie proxy = movieRepository.getReference(id);
-        // Movie  movie = (Movie) Hibernate.unproxy(proxy);
-        return movie;
+    @Autowired
+    private MovieMapper movieMapper;
+
+    @Transactional
+    public MovieDTO getMovie(Long id) {
+        MovieDTO movieDTO = movieMapper.toDto(movieRepository.find(id));
+        return movieDTO;
+    }
+
+    @Transactional
+    public MovieDetails getMovieDetails(Long id) {
+        return movieRepository.getMovieDetails(id);
     }
 
     /**
@@ -69,9 +79,15 @@ public class MovieService {
         movieBd.addReview(review);
     }
 
-    public List<Movie> getMovies(){
-        List<Movie> movies = movieRepository.getAll();
+    @Transactional
+    public List<MovieDTO> getMovies(){
+        List<MovieDTO> movies = movieMapper.toDtos(movieRepository.getAll());
         return movies;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovieDTO> findByName(String searchText){
+        return movieMapper.toDtos(movieRepository.findByName(searchText));
     }
 
     public Movie persist(Movie movie){
@@ -115,6 +131,10 @@ public class MovieService {
         return movie;
     }
 
+    @Transactional(readOnly = true)
+    public List<MovieDTO> search(String searchText){
+        return movieMapper.toDtos(movieRepository.search(searchText));
+    }
 
     @Transactional
     public void updateDescription(Long id, String description) {
