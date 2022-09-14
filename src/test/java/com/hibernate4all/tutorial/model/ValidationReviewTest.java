@@ -1,6 +1,5 @@
 package com.hibernate4all.tutorial.model;
 
-import com.hibernate4all.tutorial.config.PersistenceConfig;
 import com.hibernate4all.tutorial.domain.Review;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -14,11 +13,12 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes= {PersistenceConfig.class})
+@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ValidationReviewTest {
 

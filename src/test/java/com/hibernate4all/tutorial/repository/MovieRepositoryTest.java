@@ -1,6 +1,5 @@
 package com.hibernate4all.tutorial.repository;
 
-import com.hibernate4all.tutorial.config.PersistenceConfig;
 import com.hibernate4all.tutorial.domain.Award;
 import com.hibernate4all.tutorial.domain.Certification;
 import com.hibernate4all.tutorial.domain.Genre;
@@ -13,11 +12,7 @@ import java.time.Instant;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Table;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.transaction.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.INPUT_STREAM;
 import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,6 +20,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -33,10 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 // doit s'executer dans le contexte Spring
 @ExtendWith(SpringExtension.class)
-// donner les classes de config dont spring a besoin pour s'initialiser
-@ContextConfiguration(classes= {PersistenceConfig.class})
-// charger les données de test
-@SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
+@SpringBootTest
 @Sql({"/datas/datas-test-postgre.sql"})
 public class MovieRepositoryTest {
 

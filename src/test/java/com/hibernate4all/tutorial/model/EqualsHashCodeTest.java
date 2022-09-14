@@ -6,13 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hibernate4all.tutorial.config.PersistenceConfig;
 import com.hibernate4all.tutorial.domain.Movie;
 import com.hibernate4all.tutorial.repository.MovieRepository;
-import org.hibernate.proxy.HibernateProxy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -20,8 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 // doit s'executer dans le contexte Spring
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes= {PersistenceConfig.class})
-@SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
+@SpringBootTest
 @Sql({"/datas/datas-test-postgre.sql"})
 public class EqualsHashCodeTest {
 

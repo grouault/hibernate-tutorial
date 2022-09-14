@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
@@ -200,6 +201,7 @@ public class MovieRepository {
         return movie;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public Movie merge(Movie movie){
         Movie result = entityManager.merge(movie);
         LOGGER.trace("entityManager.contains() : " + entityManager.contains(result));
