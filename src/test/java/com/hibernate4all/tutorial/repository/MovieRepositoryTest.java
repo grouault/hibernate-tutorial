@@ -37,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes= {PersistenceConfig.class})
 // charger les données de test
 @SqlConfig(dataSource = "dataSource", transactionManager = "transactionManager")
-//@Sql({"/datas/datas-test-bulk.sql"})
+@Sql({"/datas/datas-test-postgre.sql"})
 public class MovieRepositoryTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepository.class);
@@ -47,6 +47,9 @@ public class MovieRepositoryTest {
 
     @Autowired
     private MovieService service;
+
+    @Autowired
+    private GenreRepository genreRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -227,14 +230,6 @@ public class MovieRepositoryTest {
     }
 
     @Test
-    public void testFlushOrder() {
-        Assertions.assertThrows(DataIntegrityViolationException.class, () ->{
-            Movie movie = service.removeThenAddMovie();
-            assertThat(movie.getDescription()).as("le movie n'est pas le bon").contains("v2");
-        });
-    }
-
-    @Test
     public void remove(){
         repository.remove(-1L);
         List<Movie> movies = repository.getAll();
@@ -287,4 +282,35 @@ public class MovieRepositoryTest {
         // assertThat(bio.getId()).as("l'entité Genre aurait dû être persistée").isNotNull();
     }
 
+    @Test
+    public void testCacheSecondNiveauEntite(){
+        Genre genre = genreRepository.findById(-1L);
+        assertThat(genre).isNotNull();
+        genre = genreRepository.findById(-1L);
+        genre = genreRepository.findById(-1L);
+    }
+
+    @Test
+    public void testCacheSecondNiveauRequete(){
+        Genre genre = genreRepository.findById(-1L);
+        List<Genre> genres = genreRepository.getAll();
+        assertThat(genres).isNotEmpty();
+        genre = genreRepository.findById(-1L);
+        assertThat(genre).isNotNull();
+        genres = genreRepository.getAll();
+    }
+
+    @Test
+    public void testCacheSecondNiveauCollection(){
+        repository.displayGenres(-1L);
+        repository.displayGenres(-1L);
+    }
+
+    @Test
+    public void testFlushOrder() {
+        Assertions.assertThrows(DataIntegrityViolationException.class, () ->{
+            Movie movie = service.removeThenAddMovie();
+            assertThat(movie.getDescription()).as("le movie n'est pas le bon").contains("v2");
+        });
+    }
 }

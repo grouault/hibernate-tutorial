@@ -45,6 +45,13 @@ public class MovieRepository {
         entityManager.persist(movieDetails);
     }
 
+    @Transactional
+    public void displayGenres(Long id) {
+        Movie m = this.find(id);
+        m.getGenres().stream().forEach(genre -> LOGGER.info(genre.getName()));
+    }
+
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Movie find(Long id){
         Movie result = entityManager.find(Movie.class,id);

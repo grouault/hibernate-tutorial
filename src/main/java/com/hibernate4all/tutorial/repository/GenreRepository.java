@@ -1,9 +1,11 @@
 package com.hibernate4all.tutorial.repository;
 
 import com.hibernate4all.tutorial.domain.Genre;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import org.hibernate.jpa.QueryHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,12 @@ public class GenreRepository {
         Genre genre = entityManager.find(Genre.class, id);
         LOGGER.debug("Find - genre : " + genre.toString());
         return genre;
+    }
+
+    public List<Genre> getAll(){
+        return entityManager.createQuery("from Genre", Genre.class)
+                            .setHint(QueryHints.HINT_CACHEABLE, "true")
+                            .getResultList();
     }
 
     public Genre getReference(Long id) {
