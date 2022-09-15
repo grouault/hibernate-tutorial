@@ -8,6 +8,7 @@ import com.hibernate4all.tutorial.domain.Review;
 import com.hibernate4all.tutorial.dto.MovieDTO;
 import com.hibernate4all.tutorial.mapper.MovieMapper;
 import com.hibernate4all.tutorial.repository.ActorRepository;
+import com.hibernate4all.tutorial.repository.MovieDetailsRepository;
 import com.hibernate4all.tutorial.repository.MovieRepository;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,9 @@ public class MovieService {
     @Autowired
     private MovieMapper movieMapper;
 
+    @Autowired
+    private MovieDetailsRepository movieDetailsRepository;
+
     @Transactional
     public MovieDTO getMovie(Long id) {
         MovieDTO movieDTO = movieMapper.toDto(movieRepository.find(id));
@@ -39,7 +43,7 @@ public class MovieService {
 
     @Transactional
     public MovieDetails getMovieDetails(Long id) {
-        return movieRepository.getMovieDetails(id);
+        return movieDetailsRepository.getMovieDetails(id);
     }
 
     /**

@@ -34,7 +34,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Sql({"/datas/datas-test-postgre.sql"})
 public class MovieRepositoryTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MovieRepositoryTest.class);
 
     @Autowired
     private MovieRepository repository;
@@ -47,13 +47,6 @@ public class MovieRepositoryTest {
 
     @PersistenceContext
     EntityManager entityManager;
-
-    @Test
-    public void addMovieDetails_casNominal(){
-        MovieDetails details = new MovieDetails().setPlot("Intrique du film Memento très longue!");
-        repository.addMovieDetails(details, -2L);
-        assertThat(details.getId()).as("l'entité aurait dû être persistée").isNotNull();
-    }
 
     @Test
     public void association_casNominal() {
@@ -171,12 +164,6 @@ public class MovieRepositoryTest {
         assertThat(movies).as("l'ensemble des films n'a pas été récupéré.").hasSize(2);
     }
 
-    @Test
-    @Sql({"/datas/datas-test-n+1.sql"})
-    public void getAllMovieDetails(){
-        List<MovieDetails> movieDetails = repository.getAllMovieDetail();
-        assertThat(movieDetails).as("le nombre de MovieDetails devrait être de 3").hasSize(3);
-    }
 
     @Test
     // @Sql({"/datas/datas-test-bulk.sql"})

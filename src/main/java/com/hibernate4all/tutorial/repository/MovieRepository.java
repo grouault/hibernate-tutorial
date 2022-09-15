@@ -40,13 +40,6 @@ public class MovieRepository {
     private ActorRepository actorRepository;
 
     @Transactional
-    public void addMovieDetails(MovieDetails movieDetails, Long idMovie) {
-        Movie movieRef = getReference(idMovie);
-        movieDetails.setMovie(movieRef);
-        entityManager.persist(movieDetails);
-    }
-
-    @Transactional
     public void displayGenres(Long id) {
         Movie m = this.find(id);
         m.getGenres().stream().forEach(genre -> LOGGER.info(genre.getName()));
@@ -156,43 +149,6 @@ public class MovieRepository {
         return movies;
 
 
-    }
-
-    public List<MovieDetails> getAllMovieDetail() {
-        // on charge les MovieDetails pour mise dans le cache
-        List<MovieDetails> moviesDetails = entityManager.createQuery("select md from MovieDetails md", MovieDetails.class).getResultList();
-        // chargement des movies.
-        moviesDetails = entityManager
-                .createQuery("select md from MovieDetails md join fetch md.movie where md in :movieDetails ", MovieDetails.class)
-                .setParameter("movieDetails", moviesDetails).getResultList();
-        return moviesDetails;
-    }
-
-    public MovieDetails getMovieDetails(Long id) {
-
-        MovieDetails movieDetails = entityManager.createQuery("select distinct md from MovieDetails md " +
-                                             " join fetch md.movie m" +
-                                                                 " left join fetch m.reviews " +
-                                                                 " left join fetch m.genres " +
-
-
-                                             " where md.id = :id",
-                                             MovieDetails.class)
-                                     .setParameter("id", id)
-                                     .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
-                                     .getSingleResult();
-
-        entityManager.createQuery("select distinct m from Movie m left join fetch m.awards where m = :movie", Movie.class)
-                     .setParameter("movie", movieDetails.getMovie())
-                     .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
-                     .getSingleResult();
-
-        entityManager.createQuery("select distinct m from Movie m left join fetch m.moviesActors where m = :movie", Movie.class)
-                     .setParameter("movie", movieDetails.getMovie())
-                     .setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
-                     .getSingleResult();
-
-        return movieDetails;
     }
 
     public Movie getReference(Long id) {

@@ -19,7 +19,7 @@ public class MovieDetails {
     @Column(length=4000)
     private String plot;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @MapsId
     private Movie movie;
 
